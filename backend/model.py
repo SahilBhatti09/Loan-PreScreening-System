@@ -4,22 +4,13 @@ import numpy as np
 import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-model_path = os.path.join(BASE_DIR, "model", "logistic_model.pkl")
-encoder_path = os.path.join(BASE_DIR, "model", "encoder.pkl")
-scaler_path = os.path.join(BASE_DIR, "model", "scaler.pkl")
+MODEL_DIR = os.path.join(BASE_DIR, "model")
 
-model = None
-
-def load_model():
-    global model
-    model = joblib.load(model_path)
-    return model
-
-def load_encoder():
-    return joblib.load(encoder_path)
-
-def load_scaler():
-    return joblib.load(scaler_path)
+# Load models at module level
+logistic_model = joblib.load(os.path.join(MODEL_DIR, "logistic_model.pkl"))
+random_forest_model = joblib.load(os.path.join(MODEL_DIR, "random_forest_model.pkl"))
+encoder = joblib.load(os.path.join(MODEL_DIR, "encoder.pkl"))
+scaler = joblib.load(os.path.join(MODEL_DIR, "scaler.pkl"))
 
 def pre_process_data(data: pd.DataFrame):
     categorical_cols = ['gender', 'marital_status', 'bank_customer', 'education', 'ethnicity', 'prior_default', 'employed', 'drivers_license', 'citizen']
@@ -28,9 +19,6 @@ def pre_process_data(data: pd.DataFrame):
     # Keep original data for business rules
     original_data = data.copy()
     data = data.drop(columns=["zip_code"], errors="ignore")
-
-    encoder = load_encoder()
-    scaler = load_scaler()
 
     X_cat = encoder.transform(data[categorical_cols])
     X_num = scaler.transform(data[numerical_cols])
@@ -83,7 +71,7 @@ def apply_business_rules(X_num, X_cat, original_data, ml_prediction):
 
 def predict(data: pd.DataFrame):
     X, X_num, X_cat, original_data = pre_process_data(data)
-    ml_prediction = model.predict(X)[0]
+    ml_prediction = logistic_model.predict(X)[0]
     
     # Apply business rules to override ML prediction if necessary
     final_decision, reason = apply_business_rules(X_num, X_cat, original_data, ml_prediction)
