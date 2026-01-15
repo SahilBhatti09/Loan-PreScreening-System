@@ -1,8 +1,9 @@
 from fastapi import FastAPI
-import pandas as pd
-from schema import LoanApplication, LoanApproval
-from model import predict as model_predict, load_model
 from fastapi.middleware.cors import CORSMiddleware
+import pandas as pd
+
+from .schema import LoanApplication, LoanApproval
+from .model import predict as model_predict
 
 app = FastAPI()
 
@@ -14,11 +15,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Startup event
-@app.on_event("startup")
-def startup_event():
-    load_model()
 
 @app.get("/")
 def root():
