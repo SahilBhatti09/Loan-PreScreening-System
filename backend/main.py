@@ -2,8 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
 
-from .schema import LoanApplication, LoanApproval
-from .model import predict as model_predict
+from schema import LoanApplication, LoanApproval
+from model import predict as model_predict
 
 app = FastAPI()
 
